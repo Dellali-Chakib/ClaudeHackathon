@@ -4,6 +4,7 @@ A beautiful, responsive frontend for BadgerSpace, a UW-Madison student housing c
 
 ## 🚀 Features
 
+- **🔐 UW-Madison Authentication**: Secure login with email domain restrictions (only @wisc.edu)
 - **Browse Listings**: Search and filter available spaces by date, type, price, and location
 - **Create Listings**: Multi-step form to post your space with images and details
 - **Listing Details**: Comprehensive view with image gallery, amenities, and host information
@@ -16,6 +17,7 @@ A beautiful, responsive frontend for BadgerSpace, a UW-Madison student housing c
 
 - **Next.js 14+** (App Router)
 - **TypeScript**
+- **Supabase** for authentication and backend
 - **Tailwind CSS** for styling
 - **shadcn/ui** components (Button, Card, Input, Dialog, etc.)
 - **Lucide React** for icons
@@ -27,19 +29,31 @@ A beautiful, responsive frontend for BadgerSpace, a UW-Madison student housing c
 npm install
 ```
 
-2. Run the development server:
+2. Set up Supabase authentication:
+   - Copy `.env.example` to `.env.local`
+   - Follow the complete setup guide in [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)
+   - Add your Supabase credentials to `.env.local`
+
+3. Run the development server:
 ```bash
 npm run dev
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📁 Project Structure
 
 ```
 app/
-├── layout.tsx              # Root layout with navbar
+├── layout.tsx              # Root layout with AuthProvider
 ├── page.tsx                # Landing page
+├── login/
+│   └── page.tsx           # Login page
+├── signup/
+│   └── page.tsx           # Signup page
+├── auth/
+│   └── callback/
+│       └── route.ts       # OAuth callback handler
 ├── browse/
 │   └── page.tsx           # Browse listings grid
 ├── listing/
@@ -54,7 +68,7 @@ app/
 
 components/
 ├── ui/                     # shadcn/ui components
-├── Navbar.tsx             # Navigation bar
+├── Navbar.tsx             # Navigation bar with auth UI
 ├── Footer.tsx             # Footer with disclaimers
 ├── ListingCard.tsx        # Card for browse grid
 ├── FilterSidebar.tsx      # Filters for browse page
@@ -63,8 +77,14 @@ components/
 └── CreateListingForm.tsx  # Multi-step form
 
 lib/
+├── auth/
+│   └── AuthContext.tsx    # Auth provider and hooks
+├── supabase/
+│   ├── client.ts          # Browser Supabase client
+│   ├── server.ts          # Server Supabase client
+│   └── middleware.ts      # Session management
 ├── mockData.ts            # Mock listings data
-└── utils.ts               # Helper functions
+└── utils.ts               # Helper functions + email validation
 
 types/
 └── index.ts               # TypeScript types
@@ -129,21 +149,32 @@ npm start
 npm run lint
 ```
 
+## 🔐 Authentication
+
+BadgerSpace uses Supabase for authentication with strict email domain validation:
+
+- ✅ **Allowed**: Only emails ending with `@wisc.edu` (including subdomains like `@cs.wisc.edu`)
+- ❌ **Blocked**: All other email domains
+- 🔒 **Validation**: Both frontend (UX) and backend (security) validation
+- 📧 **Email verification**: Recommended for production deployments
+
+See [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) for complete setup instructions.
+
 ## 📌 Notes
 
-- Currently uses **mock data** - backend integration will be added later
+- Currently uses **mock data** for listings - database integration coming next
 - All images use Unsplash and Pravatar for demo purposes
-- Authentication is mocked (user is always "logged in")
+- ✅ **Authentication is fully implemented** with Supabase
 - Form submissions show alerts (will be replaced with API calls)
 
-## 🎯 Next Steps (Backend Integration)
+## 🎯 Next Steps
 
-- Connect to Supabase for data persistence
-- Implement authentication
+- ✅ ~~Implement authentication~~ (COMPLETED)
+- Connect listings to Supabase database
 - Add real image upload functionality
 - Connect contact forms to messaging system
 - Add search indexing
-- Implement user verification system
+- Implement user verification badges
 
 ## 📄 License
 

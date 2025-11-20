@@ -2,13 +2,21 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth/AuthContext";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const isLoggedIn = true; // Mock: will be replaced with auth later
+  const { user, signOut } = useAuth();
+  const isLoggedIn = !!user;
+
+  const handleSignOut = async () => {
+    setUserMenuOpen(false);
+    setMobileMenuOpen(false);
+    await signOut();
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-sm">
@@ -69,12 +77,10 @@ export default function Navbar() {
                       My Listings
                     </Link>
                     <button
-                      className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        // Handle logout
-                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 flex items-center gap-2"
+                      onClick={handleSignOut}
                     >
+                      <LogOut className="h-4 w-4" />
                       Log Out
                     </button>
                   </div>
@@ -137,7 +143,7 @@ export default function Navbar() {
                 </Link>
                 <button
                   className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={handleSignOut}
                 >
                   Log Out
                 </button>

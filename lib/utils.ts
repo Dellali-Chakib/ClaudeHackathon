@@ -40,3 +40,28 @@ export function getSpaceTypeColor(type: string): string {
   return colors[type] || 'bg-gray-100 text-gray-800';
 }
 
+// Email validation for UW-Madison domains
+export function isValidWiscEmail(email: string): boolean {
+  const emailLower = email.toLowerCase().trim();
+  // Match emails ending with wisc.edu or xxx.wisc.edu (subdomains)
+  const wiscEmailPattern = /^[^\s@]+@([a-z0-9-]+\.)?wisc\.edu$/i;
+  return wiscEmailPattern.test(emailLower);
+}
+
+export function getEmailError(email: string): string | null {
+  if (!email) {
+    return 'Email is required';
+  }
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) {
+    return 'Please enter a valid email address';
+  }
+
+  if (!isValidWiscEmail(email)) {
+    return 'Only UW-Madison email addresses (ending with wisc.edu) are allowed';
+  }
+
+  return null;
+}
+
