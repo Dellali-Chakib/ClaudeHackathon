@@ -5,6 +5,7 @@ A beautiful, responsive frontend for BadgerSpace, a UW-Madison student housing c
 ## 🚀 Features
 
 - **🔐 UW-Madison Authentication**: Secure login with email domain restrictions (only @wisc.edu)
+- **💬 In-App Messaging**: Chat with hosts directly, similar to Zillow's messaging system
 - **Browse Listings**: Search and filter available spaces by date, type, price, and location
 - **Create Listings**: Multi-step form to post your space with images and details
 - **Listing Details**: Comprehensive view with image gallery, amenities, and host information
@@ -29,10 +30,11 @@ A beautiful, responsive frontend for BadgerSpace, a UW-Madison student housing c
 npm install
 ```
 
-2. Set up Supabase authentication:
+2. Set up Supabase:
    - Copy `.env.example` to `.env.local`
    - Follow the complete setup guide in [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)
    - Add your Supabase credentials to `.env.local`
+   - **For messaging**: Follow [SUPABASE_MESSAGING_SETUP.md](./SUPABASE_MESSAGING_SETUP.md) to create the database tables
 
 3. Run the development server:
 ```bash

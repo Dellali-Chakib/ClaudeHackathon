@@ -1,16 +1,39 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, User, LogOut, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { getUnreadMessageCount, subscribeToConversations } from "@/lib/supabase/messages";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { user, signOut } = useAuth();
   const isLoggedIn = !!user;
+
+  // Load unread message count
+  useEffect(() => {
+    const loadUnreadCount = async () => {
+      if (!user) {
+        setUnreadCount(0);
+        return;
+      }
+      const { count } = await getUnreadMessageCount();
+      setUnreadCount(count);
+    };
+
+    loadUnreadCount();
+
+    // Subscribe to conversation updates to refresh count
+    if (user) {
+      const unsubscribe = subscribeToConversations(loadUnreadCount);
+      return () => unsubscribe();
+    }
+  }, [user]);
 
   const handleSignOut = async () => {
     setUserMenuOpen(false);
@@ -48,6 +71,22 @@ export default function Navbar() {
             >
               My Listings
             </Link>
+
+            {/* Messages Link (only when logged in) */}
+            {isLoggedIn && (
+              <Link
+                href="/messages"
+                className="relative text-slate-700 hover:text-uw-red transition-colors flex items-center space-x-1"
+              >
+                <MessageCircle className="h-5 w-5" />
+                <span>Messages</span>
+                {unreadCount > 0 && (
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs bg-uw-red">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Badge>
+                )}
+              </Link>
+            )}
 
             {/* User Menu */}
             {isLoggedIn ? (
@@ -134,6 +173,19 @@ export default function Navbar() {
             </Link>
             {isLoggedIn ? (
               <>
+                <Link
+                  href="/messages"
+                  className="relative flex items-center px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  <span>Messages</span>
+                  {unreadCount > 0 && (
+                    <Badge className="ml-2 bg-uw-red">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </Badge>
+                  )}
+                </Link>
                 <Link
                   href="/profile"
                   className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100"

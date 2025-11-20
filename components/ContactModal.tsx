@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Listing } from "@/types";
+import { sendMessage } from "@/lib/supabase/messages";
+import { useAuth } from "@/lib/auth/AuthContext";
+import Link from "next/link";
 
 interface ContactModalProps {
   listing: Listing;
@@ -26,6 +29,9 @@ export default function ContactModal({
 }: ContactModalProps) {
   const [message, setMessage] = useState("");
   const [copied, setCopied] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -33,10 +39,38 @@ export default function ContactModal({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSendMessage = () => {
-    // Mock: In real app, this would send the message
-    console.log("Sending message:", message);
-    alert("Message sent! (This is a demo)");
+  const handleSendMessage = async () => {
+    if (!user) {
+      setError("You must be logged in to send messages");
+      return;
+    }
+
+    if (!listing.host.userId) {
+      // Fallback for hosts without user IDs (mock data)
+      console.log("Sending message:", message);
+      alert("Message sent! (Demo mode - host doesn't have a user account yet)");
+      setMessage("");
+      onOpenChange(false);
+      return;
+    }
+
+    setSending(true);
+    setError(null);
+
+    const { data, error: sendError } = await sendMessage(
+      listing.id,
+      listing.host.userId,
+      message
+    );
+
+    setSending(false);
+
+    if (sendError) {
+      setError(sendError.message || "Failed to send message");
+      return;
+    }
+
+    // Success!
     setMessage("");
     onOpenChange(false);
   };
@@ -59,24 +93,50 @@ export default function ContactModal({
         <div className="space-y-4 py-4">
           {listing.contactMethod === "in_app" ? (
             <>
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Write your message
-                </label>
-                <Textarea
-                  placeholder="Hi! I'm interested in your space for May-August. Is it still available?"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  rows={5}
-                />
-              </div>
-              <Button
-                onClick={handleSendMessage}
-                className="w-full"
-                disabled={!message.trim()}
-              >
-                Send Message
-              </Button>
+              {!user ? (
+                <div className="text-center py-4">
+                  <p className="text-slate-600 mb-4">
+                    You need to be logged in to send messages
+                  </p>
+                  <Button asChild>
+                    <Link href="/login">Sign In</Link>
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">
+                      Write your message
+                    </label>
+                    <Textarea
+                      placeholder="Hi! I'm interested in your space for May-August. Is it still available?"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      rows={5}
+                      disabled={sending}
+                    />
+                  </div>
+                  {error && (
+                    <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+                      {error}
+                    </div>
+                  )}
+                  <Button
+                    onClick={handleSendMessage}
+                    className="w-full bg-uw-red hover:bg-uw-red/90"
+                    disabled={!message.trim() || sending}
+                  >
+                    {sending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      "Send Message"
+                    )}
+                  </Button>
+                </>
+              )}
             </>
           ) : listing.contactMethod === "email" ? (
             <div className="space-y-3">
