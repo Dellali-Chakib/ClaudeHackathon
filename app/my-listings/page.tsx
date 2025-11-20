@@ -3,31 +3,65 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Eye, Edit, Trash2, Plus, ToggleLeft, ToggleRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { mockListings } from "@/lib/mockData";
-import { formatPrice, getSpaceTypeLabel, getSpaceTypeColor } from "@/lib/utils";
-import ListingCard from "@/components/ListingCard";
+import { getUserListings, deleteListing, toggleListingStatus } from "@/lib/dataService";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { formatPrice } from "@/lib/utils";
+import { Listing } from "@/types";
 
 export default function MyListingsPage() {
   const router = useRouter();
-  // Mock: In real app, filter by current user
-  const myListings = mockListings.slice(0, 3);
+  const { user, loading } = useAuth();
+  const [myListings, setMyListings] = useState<Listing[]>([]);
+
+  useEffect(() => {
+    if (!loading && user) {
+      setMyListings(getUserListings(user.id));
+    } else if (!loading && !user) {
+      // Redirect to login if not authenticated
+      router.push("/login");
+    }
+  }, [user, loading, router]);
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this listing?")) {
-      // Mock: In real app, delete from backend
-      console.log("Deleting listing:", id);
-      alert("Listing deleted! (This is a demo)");
+      try {
+        if (deleteListing(id, user?.id || null)) {
+          setMyListings(getUserListings(user?.id));
+          alert("Listing deleted successfully!");
+        }
+      } catch (error) {
+        alert(error instanceof Error ? error.message : "Failed to delete listing");
+      }
     }
   };
 
   const handleToggleStatus = (id: string) => {
-    // Mock: In real app, update status in backend
-    console.log("Toggling status for listing:", id);
+    try {
+      const updated = toggleListingStatus(id, user?.id || null);
+      if (updated) {
+        setMyListings(getUserListings(user?.id));
+      }
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to update listing");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 py-8 flex items-center justify-center">
+        <p className="text-slate-600">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 py-8">

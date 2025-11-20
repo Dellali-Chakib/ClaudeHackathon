@@ -1,21 +1,35 @@
 "use client";
 
-import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { MapPin, Calendar, DollarSign, CheckCircle2, Flag } from "lucide-react";
-import { mockListings } from "@/lib/mockData";
+import { MapPin, Calendar, DollarSign, CheckCircle2, Flag, Edit, Trash2 } from "lucide-react";
+import { getListingById, incrementViewCount, isListingOwner, deleteListing } from "@/lib/dataService";
+import { useAuth } from "@/lib/auth/AuthContext";
 import { formatDateRange, formatPrice, getSpaceTypeLabel, getSpaceTypeColor } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ImageGallery from "@/components/ImageGallery";
 import ContactModal from "@/components/ContactModal";
+import { Listing } from "@/types";
 
 export default function ListingDetailPage() {
   const params = useParams();
-  const listing = mockListings.find((l) => l.id === params.id);
+  const router = useRouter();
+  const { user } = useAuth();
+  const [listing, setListing] = useState<Listing | undefined>(undefined);
   const [contactModalOpen, setContactModalOpen] = useState(false);
+
+  useEffect(() => {
+    const foundListing = getListingById(params.id as string);
+    setListing(foundListing);
+    if (foundListing) {
+      incrementViewCount(foundListing.id);
+    }
+  }, [params.id]);
+
+  const isOwner = listing ? isListingOwner(listing, user?.id) : false;
 
   if (!listing) {
     return (
@@ -136,17 +150,52 @@ export default function ListingDetailPage() {
 
             {/* CTA Buttons */}
             <div className="space-y-3">
-              <Button
-                className="w-full bg-uw-red hover:bg-uw-red/90"
-                size="lg"
-                onClick={() => setContactModalOpen(true)}
-              >
-                Contact Host
-              </Button>
-              <Button variant="ghost" className="w-full" size="sm">
-                <Flag className="h-4 w-4 mr-2" />
-                Report Listing
-              </Button>
+              {isOwner ? (
+                <>
+                  <Button
+                    className="w-full bg-uw-red hover:bg-uw-red/90"
+                    size="lg"
+                    onClick={() => router.push(`/create?edit=${listing.id}`)}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Listing
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full text-red-600 hover:text-red-700"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm("Are you sure you want to delete this listing?")) {
+                        try {
+                          if (deleteListing(listing.id, user?.id || null)) {
+                            alert("Listing deleted successfully!");
+                            router.push("/my-listings");
+                          }
+                        } catch (error) {
+                          alert(error instanceof Error ? error.message : "Failed to delete listing");
+                        }
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Listing
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    className="w-full bg-uw-red hover:bg-uw-red/90"
+                    size="lg"
+                    onClick={() => setContactModalOpen(true)}
+                  >
+                    Contact Host
+                  </Button>
+                  <Button variant="ghost" className="w-full" size="sm">
+                    <Flag className="h-4 w-4 mr-2" />
+                    Report Listing
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -5,10 +5,12 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import ListingCard from "@/components/ListingCard";
 import FilterSidebar from "@/components/FilterSidebar";
-import { mockListings } from "@/lib/mockData";
-import { FilterState, Listing } from "@/types";
+import { getAllListings } from "@/lib/dataService";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { FilterState } from "@/types";
 
 export default function BrowsePage() {
+  const { user } = useAuth();
   const [filters, setFilters] = useState<FilterState>({
     minPrice: 0,
     maxPrice: 2000,
@@ -16,7 +18,8 @@ export default function BrowsePage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredListings = useMemo(() => {
-    let results = [...mockListings];
+    // Get all active listings, excluding user's own listings
+    let results = getAllListings(user?.id, true);
 
     // Search filter
     if (searchQuery) {
@@ -53,7 +56,7 @@ export default function BrowsePage() {
     }
 
     return results;
-  }, [filters, searchQuery]);
+  }, [filters, searchQuery, user?.id]);
 
   const handleApplyFilters = () => {
     // Filters are already applied in useMemo
