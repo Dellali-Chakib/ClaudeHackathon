@@ -14,6 +14,7 @@ export interface Host {
 
 export interface Listing {
   id: string;
+  userId: string; // ID of the user who created the listing
   title: string;
   type: SpaceType;
   price: number;
@@ -28,6 +29,8 @@ export interface Listing {
   contactInfo?: string;
   status: ListingStatus;
   viewCount: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface FilterState {

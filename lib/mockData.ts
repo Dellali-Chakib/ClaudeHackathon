@@ -1,8 +1,25 @@
 import { Listing } from '@/types';
 
+// Mock user IDs for demo purposes (these would come from Supabase auth in production)
+const MOCK_USER_IDS = {
+  sarah: 'mock-user-sarah-chen',
+  mike: 'mock-user-mike-johnson',
+  emma: 'mock-user-emma-rodriguez',
+  alex: 'mock-user-alex-kim',
+  jordan: 'mock-user-jordan-taylor',
+  riley: 'mock-user-riley-martinez',
+  casey: 'mock-user-casey-brown',
+  morgan: 'mock-user-morgan-lee',
+  taylor: 'mock-user-taylor-white',
+  sam: 'mock-user-sam-davis',
+  jamie: 'mock-user-jamie-wilson',
+  blake: 'mock-user-blake-anderson',
+};
+
 export const mockListings: Listing[] = [
   {
     id: '1',
+    userId: MOCK_USER_IDS.sarah,
     title: 'Spacious 1BR near Camp Randall',
     type: 'full_space',
     price: 600,
@@ -29,6 +46,7 @@ export const mockListings: Listing[] = [
   },
   {
     id: '2',
+    userId: MOCK_USER_IDS.mike,
     title: 'Storage space in Lakeshore dorm',
     type: 'storage',
     price: 75,
@@ -54,6 +72,7 @@ export const mockListings: Listing[] = [
   },
   {
     id: '3',
+    userId: MOCK_USER_IDS.emma,
     title: 'Cozy Studio Apartment - State Street',
     type: 'full_space',
     price: 850,
@@ -80,6 +99,7 @@ export const mockListings: Listing[] = [
   },
   {
     id: '4',
+    userId: MOCK_USER_IDS.alex,
     title: 'Summer Sublet - 2BR Apartment',
     type: 'full_space',
     price: 500,
@@ -105,6 +125,7 @@ export const mockListings: Listing[] = [
   },
   {
     id: '5',
+    userId: MOCK_USER_IDS.jordan,
     title: 'Storage Unit - Basement Space',
     type: 'storage',
     price: 50,
@@ -130,6 +151,7 @@ export const mockListings: Listing[] = [
   },
   {
     id: '6',
+    userId: MOCK_USER_IDS.riley,
     title: 'Short-term Stay - Memorial Union Area',
     type: 'short_term',
     price: 80,
@@ -155,6 +177,7 @@ export const mockListings: Listing[] = [
   },
   {
     id: '7',
+    userId: MOCK_USER_IDS.casey,
     title: 'Furnished Room - Near Library Mall',
     type: 'full_space',
     price: 550,
@@ -181,6 +204,7 @@ export const mockListings: Listing[] = [
   },
   {
     id: '8',
+    userId: MOCK_USER_IDS.morgan,
     title: 'Climate-Controlled Storage',
     type: 'storage',
     price: 90,
@@ -206,6 +230,7 @@ export const mockListings: Listing[] = [
   },
   {
     id: '9',
+    userId: MOCK_USER_IDS.taylor,
     title: 'Modern 1BR - Near Engineering',
     type: 'full_space',
     price: 750,
@@ -231,6 +256,7 @@ export const mockListings: Listing[] = [
   },
   {
     id: '10',
+    userId: MOCK_USER_IDS.sam,
     title: 'Shared Room - Regent Street',
     type: 'full_space',
     price: 400,
@@ -255,6 +281,7 @@ export const mockListings: Listing[] = [
   },
   {
     id: '11',
+    userId: MOCK_USER_IDS.jamie,
     title: 'Weekend Stay - Near Kohl Center',
     type: 'short_term',
     price: 100,
@@ -280,6 +307,7 @@ export const mockListings: Listing[] = [
   },
   {
     id: '12',
+    userId: MOCK_USER_IDS.blake,
     title: 'Large Storage Space - Garage',
     type: 'storage',
     price: 65,

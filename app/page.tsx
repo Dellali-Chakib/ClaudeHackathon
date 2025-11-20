@@ -11,11 +11,13 @@ export default function Home() {
       <div className="relative h-[600px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920"
-            alt="UW-Madison Campus"
+            src="/images/download.png"
+            alt="State Street, Madison looking towards Wisconsin State Capitol"
             fill
-            className="object-cover"
+            className="object-cover object-center"
             priority
+            quality={100}
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
         </div>
